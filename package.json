@@ -24,6 +24,7 @@
     "typescript-eslint": "^7.11.0"
   },
   "scripts": {
-    "indexDocuments": "tsc && node dist/generateVectorDB.js"
+    "indexDocuments": "tsc && node dist/generateVectorDB.js",
+    "makeQuery": "tsc && node dist/makeQuery.js"
   }
 }
