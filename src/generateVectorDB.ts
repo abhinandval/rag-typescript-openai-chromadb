@@ -2,7 +2,7 @@ import { DirectoryLoader } from 'langchain/document_loaders/fs/directory';
 import { TextLoader } from 'langchain/document_loaders/fs/text';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { Document } from '@langchain/core/documents';
-import { OpenAIEmbeddings } from '@langchain/openai';
+import { GoogleGenerativeAIEmbeddings } from '@langchain/google-genai'
 import { Index, Pinecone, RecordMetadata } from '@pinecone-database/pinecone';
 import { PineconeStore } from '@langchain/pinecone';
 import dotEnv from 'dotenv';
@@ -21,8 +21,8 @@ async function loadDocuments() {
 
 async function splitText(documents: Document[]) {
   const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 300,
-    chunkOverlap: 100,
+    chunkSize: 1000,
+    chunkOverlap: 500,
   });
 
   const chunks = await splitter.splitDocuments(documents);
@@ -63,7 +63,7 @@ async function saveToPineConeVectorDB(chunks: Document[]) {
 
     await pinecone.createIndex({
       name: indexName,
-      dimension: 1536,
+      dimension: 768,
       metric: 'cosine',
       spec: {
         serverless: {
@@ -77,7 +77,9 @@ async function saveToPineConeVectorDB(chunks: Document[]) {
 
     const pineconeIndex = pinecone.Index(indexName);
 
-    await PineconeStore.fromDocuments(chunks, new OpenAIEmbeddings(), {
+    await PineconeStore.fromDocuments(chunks, new GoogleGenerativeAIEmbeddings({
+      modelName: 'text-embedding-004'
+    }), {
       pineconeIndex,
       maxConcurrency: 5,
     });
