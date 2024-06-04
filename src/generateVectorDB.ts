@@ -52,17 +52,30 @@ async function saveToPineConeVectorDB(chunks: Document[]) {
 
   if (indexName) {
     const pinecone = new Pinecone();
-    let pineconeIndex: Index<RecordMetadata>;
-
     const allIndices = await pinecone.listIndexes();
     if (allIndices.indexes?.some((item) => item.name === indexName)) {
       console.log(`Index ${indexName} exits`);
-      pineconeIndex = pinecone.Index(indexName);
-      await pineconeIndex.deleteAll();
-      console.log(`Flushed index ${indexName}`);
-    } else {
-      return;
+
+      await pinecone.deleteIndex(indexName);
+
+      console.log(`Deleted index ${indexName}`);
     }
+
+    await pinecone.createIndex({
+      name: indexName,
+      dimension: 1536,
+      metric: 'cosine',
+      spec: {
+        serverless: {
+          cloud: 'aws',
+          region: 'us-east-1',
+        },
+      },
+    });
+
+    console.log(`Created new index with name ${indexName}`);
+
+    const pineconeIndex = pinecone.Index(indexName);
 
     await PineconeStore.fromDocuments(chunks, new OpenAIEmbeddings(), {
       pineconeIndex,
