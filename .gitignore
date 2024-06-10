@@ -4,5 +4,14 @@ dist
 # node
 node_modules
 
+# logs
+
 # env
 .env
+!.env.example
+
+# documents
+documents
+
+# chromadb persistance
+chroma

@@ -4,20 +4,18 @@ import {
   ChatGoogleGenerativeAI,
 } from '@langchain/google-genai';
 import dotEnv from 'dotenv';
-import { Index, Pinecone, RecordMetadata } from '@pinecone-database/pinecone';
-import { PineconeStore } from '@langchain/pinecone';
 import { PromptTemplate } from '@langchain/core/prompts';
+import { Chroma } from '@langchain/community/vectorstores/chroma';
 
 dotEnv.config();
 
 const PROMPT_TEMPLATE = `
-Answer the question based only on the following context:
-
-{context}
-
----
-
-Answer the question based on the above context: {question}
+<s> [INST] You are an assistant for question-answering tasks. Use the following pieces of retrieved context 
+to answer the question. If you don't know the answer, just say that you don't know. Use three sentences
+maximum and keep the answer concise. [/INST] </s> 
+[INST] Question: {question} 
+Context: {context} 
+Answer: [/INST]
 `;
 
 async function main() {
@@ -47,28 +45,22 @@ async function main() {
     return;
   }
 
-  const pinecone = new Pinecone();
-  let pineconeIndex: Index<RecordMetadata>;
-
-  //* Check if index exits
-  const allIndices = await pinecone.listIndexes();
-  if (allIndices.indexes?.some((item) => item.name === indexName)) {
-    console.log(`Index ${indexName} exits`);
-    pineconeIndex = pinecone.Index(indexName);
-  } else {
-    return;
-  }
-
-  const vectorStore = await PineconeStore.fromExistingIndex(
+  const chromaVectorStore = await Chroma.fromExistingCollection(
     new GoogleGenerativeAIEmbeddings({
       modelName: 'text-embedding-004',
     }),
-    { pineconeIndex }
+    {
+      collectionName: 'simple-document-collection',
+      numDimensions: 768,
+    }
   );
 
   //! Search DB
   const k = 3;
-  const results = await vectorStore.similaritySearchWithScore(query_text, k);
+  const results = await chromaVectorStore.similaritySearchWithScore(
+    query_text,
+    k
+  );
 
   if (results.length === 0 || results[0][1] < 0.6) {
     console.error('Unable to find matching results');
@@ -91,7 +83,7 @@ async function main() {
   const sources = results.map(
     ([doc]) => (doc.metadata['source'] as string) ?? 'no-source'
   );
-  const formattedResponse = `\nResponse: ${(await response).content}\n\nSources: ${sources}`;
+  const formattedResponse = `\nResponse: ${response.content}\n\nSources: ${sources}`;
   console.log(formattedResponse);
 }
 
