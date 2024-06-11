@@ -26,6 +26,8 @@ Before you begin, make sure you have the following installed:
 
 2. Copy the `.env.sample` file to `.env` and replace the placeholder values with your actual configuration. This file contains environment variables needed for your application.
 
+   **NOTE** goto [https://ai.google.dev/gemini-api/docs/api-key] to get your Google API key and replace the placeholder values in `.env` file with them.
+
 3. Install project dependencies:
 
     ```bash
