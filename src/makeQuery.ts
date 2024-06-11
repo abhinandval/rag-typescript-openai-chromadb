@@ -79,9 +79,9 @@ async function main() {
   const response = await model.invoke(finalPrompt);
 
   const sources = results.map(
-    ([doc]) => (doc.metadata['source'] as string) ?? 'no-source'
+    ([doc]) => (doc.metadata['source'] as string).split('\\').splice(-2).join(':') ?? 'no-source'
   );
-  const formattedResponse = `\nResponse: ${response.content}\n\nSources: ${sources}`;
+  const formattedResponse = `\n-------\nResponse: ${response.content}\n[Sources: ${sources}]`;
   console.log(formattedResponse);
 }
 
