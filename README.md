@@ -13,6 +13,7 @@ Before you begin, make sure you have the following installed:
     ```bash
     npm install -g yarn
     ```
+3. **Python**: This project requires Python version 3.8 to 3.11. You can download the appropriate installer from [https://www.python.org/downloads/](https://www.python.org/downloads/). Verify your installation by running `python --version`.
 
 ## Setup
 
@@ -30,10 +31,18 @@ Before you begin, make sure you have the following installed:
     ```bash
     yarn install
     ```
+4. Install ChromaDB
+   ```bash 
+   pip install chromadb
+   ```
 
 ## Usage
+1. Start ChromaDB using the following command:
+   ```bash
+   chroma run --path chroma 
+   ```
 
-1. Create a vector database index by running:
+2. Create a vector database index by running:
 
     ```bash
     yarn indexDocuments
@@ -41,7 +50,7 @@ Before you begin, make sure you have the following installed:
 
    This command will create an index for your documents in the database.
 
-2. Start querying your data using:
+3. Start querying your data using:
 
     ```bash
     yarn makeQuery
