@@ -77,7 +77,9 @@ async function main() {
   });
   console.log('finalPrompt:', finalPrompt);
 
-  const model = new ChatGoogleGenerativeAI();
+  const model = new ChatGoogleGenerativeAI({
+    model: 'gemini-1.5-pro-latest'
+  });
   const response = await model.invoke(finalPrompt);
 
   const sources = results.map(
