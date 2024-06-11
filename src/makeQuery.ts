@@ -62,10 +62,6 @@ async function main() {
     k
   );
 
-  if (results.length === 0 || results[0][1] < 0.6) {
-    console.error('Unable to find matching results');
-    return;
-  }
 
   const contextText = results
     .map(([doc, _score]) => doc.pageContent)
